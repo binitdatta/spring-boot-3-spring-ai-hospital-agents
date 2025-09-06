@@ -1,0 +1,45 @@
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.2
+      embedding:
+        options:
+          model: text-embedding-3-small   # <-- ensures EmbeddingModel bean exists
+    vectorstore:
+      redis:
+        initialize-schema: true
+        index-name: ai:vs:docs
+  datasource:
+    url: jdbc:mysql://localhost:3306/ai_agent_factory
+    username: root
+    password: localroot
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  data:
+    redis:
+      host: localhost
+      port: 6380
+
+server:
+  port: 8025
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+logging:
+  level:
+    root: INFO
+    com.rollingstone: INFO
