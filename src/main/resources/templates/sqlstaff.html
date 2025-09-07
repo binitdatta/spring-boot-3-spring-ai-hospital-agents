@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Hospital Ops SQL QA</title>
+    <title>Hospital Ops – Staffing Assistant</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap 5 + Icons -->
@@ -20,21 +20,22 @@
     .glass{backdrop-filter:blur(8px);background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:1rem;box-shadow:0 10px 40px rgba(0,0,0,.2)}
     pre.code{background:#0b1020;color:#e3eafc;padding:1rem;border-radius:.5rem;overflow:auto}
     .badge-pill{border-radius:999px}
+    .bg-dim{background:rgba(0,0,0,.35)}
   </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(10,10,10,0.7);">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/sqlqa">
-            <i class="bi bi-hospital"></i> Hospital Ops <span class="text-info">SQL QA</span>
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-hospital"></i> Hospital Ops <span class="text-info">Staffing</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbars">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div id="navbars" class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link active" href="/sqlqa"><i class="bi bi-graph-up"></i> Capacity</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-people"></i> Staffing</a></li>
                 <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Settings</a></li>
                 <li class="nav-item"><a class="nav-link" href="https://getbootstrap.com" target="_blank"><i class="bi bi-bootstrap"></i> Bootstrap</a></li>
             </ul>
@@ -43,67 +44,60 @@
 </nav>
 
 <div id="hero" class="container mt-4">
-    <div id="heroCarousel" class="carousel slide glass" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-        </div>
+    <div class="carousel slide glass" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active text-white p-5">
                 <div class="row align-items-center">
                     <div class="col-lg-8">
-                        <h1 class="display-5 fw-bold">Ask hospital ops questions in English</h1>
-                        <p class="lead">We’ll plan SQL, run it safely, and compose a clear answer with context.</p>
-                        <span class="badge bg-warning text-dark badge-pill">RAG Ready</span>
-                        <span class="badge bg-info text-dark badge-pill">Read-only SQL</span>
+                        <h1 class="display-6 fw-bold">Ask staffing questions in plain English</h1>
+                        <p class="lead mb-1">Snapshot · Plan · Apply — safely, with audit.</p>
+                        <span class="badge bg-warning text-dark badge-pill">Natural Language</span>
+                        <span class="badge bg-info text-dark badge-pill">Guarded Writes</span>
                         <span class="badge bg-success badge-pill">Audited</span>
                     </div>
                     <div class="col-lg-4 text-center">
-                        <i class="bi bi-bar-chart-line-fill" style="font-size: 5rem;"></i>
+                        <i class="bi bi-diagram-3" style="font-size: 4.5rem;"></i>
                     </div>
                 </div>
             </div>
-            <div class="carousel-item text-white p-5">
-                <h2 class="fw-semibold">Capacity · EVS · Transport · Inventory</h2>
-                <p>Prebuilt schema lets you ask occupancy, cleaning SLAs, transport latency, and par-level gaps.</p>
-            </div>
-            <div class="carousel-item text-white p-5">
-                <h2 class="fw-semibold">Colorful. Dazzling. Useful.</h2>
-                <p>Bootstrap 5 + a touch of glassmorphism keeps it delightful without sacrificing clarity.</p>
-            </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
     </div>
 </div>
 
 <div class="container my-4">
     <div class="card glass text-white">
         <div class="card-body">
-            <h4 class="card-title mb-3"><i class="bi bi-terminal"></i> Build your query</h4>
+            <h4 class="card-title mb-3"><i class="bi bi-terminal"></i> Ask in English</h4>
 
-            <form class="row g-3" method="post" action="/sqlqa/run">
+            <!-- POSTs as application/x-www-form-urlencoded to your MVC endpoint -->
+            <form class="row g-3" method="post" action="/api/staffing/v3/ask/form">
                 <div class="col-12">
-                    <label for="question" class="form-label">Question (English)</label>
-                    <textarea id="question" name="question" rows="4" class="form-control"
-                              placeholder="Ask in English (e.g., OUT_OF_SERVICE beds...)"
-                              th:text="${question}"></textarea>
-                    <div class="form-text text-light">Maps to the <code>question</code> in your curl JSON.</div>
+                    <label for="message" class="form-label">Message</label>
+                    <textarea id="message" name="message" rows="4" class="form-control"
+                              placeholder='e.g., "Show current vs target staffing for the DAY shift today from 2 pm to 10 pm."'
+                              th:text="${prompt}"></textarea>
+                    <div class="form-text text-light">This maps to the <code>message</code> parameter.</div>
                 </div>
 
-                <div class="col-md-3">
-                    <label for="limit" class="form-label">Row Limit</label>
-                    <input id="limit" name="limit" type="number" min="1" max="5000" class="form-control"
-                           th:value="${limit}">
-                    <div class="form-text text-light">Maps to the <code>limit</code> in your curl JSON.</div>
+                <!-- Optional: Quick examples -->
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-outline-light" type="button"
+                                onclick="fill('Show current vs target staffing for the DAY shift today from 2:00 pm to 10:00 pm.')">
+                            Snapshot: DAY 2–10 pm
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" type="button"
+                                onclick="fill('Plan transfers to balance the DAY shift today.')">
+                            Plan: Balance DAY
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" type="button"
+                                onclick="fill('Move staff 2 from unit 2 to unit 1 role 3 for DAY shift start 2025-08-25T14:00:00Z end 2025-08-25T22:00:00Z, split.')">
+                            Apply: Example move
+                        </button>
+                    </div>
                 </div>
 
-                <div class="col-md-9 d-flex align-items-end justify-content-end gap-2">
+                <div class="col-md-12 d-flex align-items-end justify-content-end gap-2">
                     <button type="submit" class="btn btn-warning">
                         <i class="bi bi-lightning-charge-fill"></i> Run
                     </button>
@@ -113,81 +107,108 @@
                 </div>
             </form>
 
+            <!-- Error display -->
+            <div class="alert alert-danger mt-3" role="alert" th:if="${error != null}" th:text="${error}">Error</div>
+
             <hr class="border-light my-4" th:if="${ran}"/>
 
+            <!-- Results -->
             <div th:if="${ran}">
-                <div class="row">
-                    <div class="col-lg-7">
-                        <h5 class="mb-2"><i class="bi bi-filetype-sql"></i> Generated SQL</h5>
-                        <pre class="code" th:text="${sql}"></pre>
-                        <div class="small text-light">
-                            <span class="badge bg-primary me-2">rows: <span th:text="${rowCount}">0</span></span>
-                            <span class="badge bg-secondary">elapsed: <span th:text="${elapsed}">0</span> ms</span>
-                        </div>
-                        <div class="mt-2">
-                            <h6><i class="bi bi-sliders"></i> Params</h6>
-                            <pre class="code" th:text="${paramsJson}"></pre>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <h5 class="mb-2"><i class="bi bi-chat-text-fill"></i> Answer</h5>
-                        <div class="p-3 bg-dark rounded-3">
-                            <p class="mb-0" th:utext="${#strings.replace(answer, '\n','<br/>')}"></p>
-                        </div>
-                    </div>
+                <div class="p-3 bg-dim rounded-3 mb-3">
+                    <div><b>Action:</b> <span th:text="${action}">SNAPSHOT</span></div>
+                    <div><b>Note:</b> <span th:text="${note}">—</span></div>
                 </div>
 
-                <!-- Results table -->
-                <div class="mt-4" th:if="${rows != null and !rows.isEmpty()}">
-                    <h5 class="mb-2"><i class="bi bi-table"></i> Rows</h5>
+                <!-- SNAPSHOT TABLE -->
+                <div th:if="${snapshot != null}">
+                    <h5 class="mb-2"><i class="bi bi-people"></i> Current vs Target (Snapshot)</h5>
+                    <div class="row small mb-2">
+                        <div class="col">
+                            <b>Shift:</b> <span th:text="${snapshot.shiftName}">DAY</span>
+                            · <b>Start:</b> <span th:text="${snapshot.windowStart}">—</span>
+                            · <b>End:</b> <span th:text="${snapshot.windowEnd}">—</span>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-dark table-striped table-hover align-middle">
-                            <thead th:if="${cols != null and !cols.isEmpty()}">
+                            <thead>
                             <tr>
-                                <th th:each="col : ${cols}" th:text="${col}">col</th>
+                                <th>Unit</th>
+                                <th>Role</th>
+                                <th>Current</th>
+                                <th>Target</th>
+                                <th>Gap</th>
+                                <th>Status</th>
                             </tr>
                             </thead>
-                            <tbody th:if="${cols != null and !cols.isEmpty()}">
-                            <tr th:each="r : ${rows}">
-<!--                                <td th:each="col : ${cols}" th:text="${r[col]} ?: ''">val</td>-->
-<!--                                <td th:each="col : ${cols}" th:text="${#maps.get(r, col)}">val</td>-->
-                                <td th:each="col : ${cols}" th:text="${r.get(col)} ?: ''">val</td>
-                            </tr>
-                            </tbody>
-
-                            <!-- Fallback: if cols are missing for any reason, render key/value lists -->
-                            <tbody th:if="${cols == null or cols.isEmpty()}">
-                            <tr>
+                            <tbody>
+                            <tr th:each="row : ${snapshot.rows}">
+                                <td th:text="${row.unitCode}">ED-1</td>
+                                <td th:text="${row.roleCode}">RN</td>
+                                <td th:text="${row.currentCount}">0</td>
+                                <td th:text="${row.targetCount}">5</td>
+                                <td th:text="${row.variance}">-5</td>
                                 <td>
-                                    <div class="row" th:each="r, ri : ${rows}">
-                                        <div class="col-12 mb-2">
-                                            <div class="card bg-secondary text-white">
-                                                <div class="card-body p-2">
-                                                    <div class="fw-bold">Row <span th:text="${ri.index + 1}">1</span></div>
-                                                    <div class="small" th:each="e : ${r.entrySet()}">
-                                                        <code th:text="${e.key}">key</code>:
-                                                        <span th:text="${e.value}">value</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <span th:if="${row.understaffed}" class="badge bg-danger">UNDER</span>
+                                    <span th:if="${row.overstaffed}"  class="badge bg-warning text-dark">OVER</span>
+                                    <span th:if="${!row.understaffed and !row.overstaffed}" class="badge bg-success">ON TARGET</span>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Optional: debug payload to verify rows/cols coming into the view -->
-                    <!--
-                    <details class="mt-2">
-                      <summary class="text-muted">Debug: rows JSON</summary>
-                      <pre class="code" th:text="${rowsJson}">[]</pre>
-                    </details>
-                    -->
                 </div>
 
-            </div>
+                <!-- PLAN -->
+                <div th:if="${plan != null}" class="mt-4">
+                    <h5 class="mb-2"><i class="bi bi-diagram-3"></i> Transfer Plan</h5>
+                    <div class="p-3 bg-dim rounded-3 mb-2">
+                        <div><b>Shift:</b> <span th:text="${plan.shiftName}">DAY</span></div>
+                        <div><b>Start:</b> <span th:text="${plan.windowStart}">—</span>
+                            · <b>End:</b> <span th:text="${plan.windowEnd}">—</span></div>
+                        <div><b>Requires approval:</b> <span th:text="${plan.requiresApproval}">true</span></div>
+                        <div><b>Summary:</b> <span th:text="${plan.summary}">—</span></div>
+                    </div>
+                    <div th:if="${plan.transfers != null and !plan.transfers.isEmpty()}">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent text-white border-secondary"
+                                th:each="t : ${plan.transfers}">
+                                Move staff <b th:text="${t.staffId}">2</b>
+                                <span th:if="${t.roleId != null}">(role <span th:text="${t.roleId}">3</span>)</span>
+                                from unit <b th:text="${t.fromUnitId}">2</b> to <b th:text="${t.toUnitId}">1</b>
+                            </li>
+                        </ul>
+                    </div>
+                    <div th:if="${plan.transfers == null or plan.transfers.isEmpty()}" class="text-muted">
+                        No transfers proposed.
+                    </div>
+                </div>
+
+                <!-- APPLY RESULT -->
+                <div th:if="${apply != null}" class="mt-4">
+                    <h5 class="mb-2"><i class="bi bi-check2-circle"></i> Apply Result</h5>
+                    <div class="p-3 bg-dim rounded-3 mb-2">
+                        <div><b>Applied Count:</b> <span th:text="${apply.appliedCount}">0</span></div>
+                    </div>
+                    <div th:if="${apply.details != null and !apply.details.isEmpty()}">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent text-white border-secondary"
+                                th:each="d : ${apply.details}">
+                                <b th:text="${d.status}">APPLIED</b>: staff
+                                <span th:text="${d.staffId}">2</span> from unit
+                                <span th:text="${d.fromUnitId}">2</span> to
+                                <span th:text="${d.toUnitId}">1</span>
+                                — <span th:text="${d.message}">OK</span>
+                                <span class="text-muted">
+                  (<span th:text="${d.closedAssignmentId}">-</span> → <span th:text="${d.newAssignmentId}">-</span>)
+                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div> <!-- /ran -->
         </div>
     </div>
 </div>
@@ -198,6 +219,13 @@
     </div>
 </footer>
 
+<script>
+  function fill(text){
+    const ta = document.getElementById('message');
+    ta.value = text;
+    ta.focus();
+  }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

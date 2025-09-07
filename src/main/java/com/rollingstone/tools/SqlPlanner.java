@@ -24,7 +24,8 @@ public class SqlPlanner {
                 Do NOT use any catalog/schema prefixes (no `db.table`). Use unqualified table names.
                 Prefer WHERE filters and LIMIT.
                 If the English question is ambiguous, assume sensible defaults and comment in "notes".
-
+                When using GROUP BY, include every non-aggregated selected column in GROUP BY.
+                Do not select bare columns that are not functionally dependent on the GROUP BY keys; aggregate them (e.g., SUM/COUNT/MAX) instead.
                 Output STRICT JSON with NO markdown fences or commentary:
                 {
                   "sql": "SELECT ... WHERE ... LIMIT 200",

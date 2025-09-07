@@ -38,6 +38,19 @@ List OUT_OF_SERVICE beds with unit.code, room_number, bed_label, and days_since_
         return "sqlqa";
     }
 
+    @GetMapping({"/staff"})
+    public String formStaff(Model model,
+                       @RequestParam(value = "q", required = false) String q,
+                       @RequestParam(value = "limit", required = false) Integer limit) {
+        String defaultQ = """
+List OUT_OF_SERVICE beds with unit.code, room_number, bed_label, and days_since_last_cleaned = TIMESTAMPDIFF(DAY, bed.last_cleaned_at, NOW()). Use bed -> room -> unit. Order by days_since_last_cleaned DESC.
+        """.trim();
+        model.addAttribute("question", q == null ? defaultQ : q);
+        model.addAttribute("limit", limit == null ? 500 : limit);
+        model.addAttribute("ran", false);
+        return "sqlstaff";
+    }
+
     @PostMapping("/sqlqa/run")
     public String run(@RequestParam("question") String question,
                       @RequestParam("limit") Integer limit,

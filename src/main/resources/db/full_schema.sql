@@ -1,3 +1,7 @@
+create database ai_agent_factory
+
+use ai_agent_factory
+
 create table department
 (
     department_id bigint auto_increment
